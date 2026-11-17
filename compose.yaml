@@ -1,0 +1,50 @@
+services:
+  hermes:
+    build:
+      context: .
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    expose:
+      - "8000"
+    environment:
+      MAIL_IMAP_HOST: ${MAIL_IMAP_HOST:?MAIL_IMAP_HOST is required}
+      MAIL_IMAP_PORT: ${MAIL_IMAP_PORT:-993}
+      MAIL_IMAP_USER: ${MAIL_IMAP_USER:?MAIL_IMAP_USER is required}
+      MAIL_IMAP_PASSWORD: ${MAIL_IMAP_PASSWORD:?MAIL_IMAP_PASSWORD is required}
+      MAIL_IMAP_FOLDER: ${MAIL_IMAP_FOLDER:-INBOX}
+      MAIL_CONNECT_TIMEOUT_SECONDS: ${MAIL_CONNECT_TIMEOUT_SECONDS:-15}
+      MAIL_MAX_MESSAGES_PER_REQUEST: ${MAIL_MAX_MESSAGES_PER_REQUEST:-50}
+      MAIL_MAX_MESSAGE_BYTES: ${MAIL_MAX_MESSAGE_BYTES:-2097152}
+      MAIL_MAX_BODY_TEXT_CHARS: ${MAIL_MAX_BODY_TEXT_CHARS:-50000}
+      API_AUTH_TOKEN: ${API_AUTH_TOKEN:?API_AUTH_TOKEN is required}
+      API_COMMERCIAL_AGENT_TOKEN: ${API_COMMERCIAL_AGENT_TOKEN:-}
+      API_RATE_LIMIT_PER_MINUTE: ${API_RATE_LIMIT_PER_MINUTE:-60}
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).read()"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    mem_limit: 256m
+    cpus: 1.0
+    pids_limit: 128
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - hermes_private
+
+networks:
+  hermes_private:
+    driver: bridge
+  agents-net:
+    external: true
+

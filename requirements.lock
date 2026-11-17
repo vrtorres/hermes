@@ -1,0 +1,13 @@
+# Runtime lock used by the container. Keep synchronized with pyproject.toml.
+annotated-types==0.8.0
+anyio==4.16.0
+click==8.5.1
+fastapi==0.115.8
+h11==0.16.0
+idna==3.20
+pydantic==2.10.6
+pydantic-core==2.27.2
+starlette==0.45.3
+typing-extensions==4.16.0
+uvicorn==0.34.0
+
